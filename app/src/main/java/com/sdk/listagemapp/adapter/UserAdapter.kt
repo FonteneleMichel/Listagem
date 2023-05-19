@@ -1,4 +1,4 @@
-package com.sdk.listagemapp.viewmodel
+package com.sdk.listagemapp.adapter
 
 import android.view.LayoutInflater
 import android.view.View
@@ -8,7 +8,7 @@ import com.sdk.listagemapp.model.User
 import androidx.recyclerview.widget.RecyclerView
 import com.sdk.listagemapp.R
 
-class UserAdapter : RecyclerView.Adapter<UserAdapter.UserViewHolder>() {
+class UserAdapter(private val onItemClick: (User) -> Unit) : RecyclerView.Adapter<UserAdapter.UserViewHolder>() {
     private val userList: MutableList<User> = mutableListOf()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserViewHolder {
@@ -19,6 +19,11 @@ class UserAdapter : RecyclerView.Adapter<UserAdapter.UserViewHolder>() {
     override fun onBindViewHolder(holder: UserViewHolder, position: Int) {
         val user = userList[position]
         holder.bind(user)
+        holder.itemView.setOnClickListener {
+            // Chamar o método para lidar com o clique do item da lista
+            onItemClick(user)
+        }
+        // Resto do código do onBindViewHolder
     }
 
     override fun getItemCount(): Int {

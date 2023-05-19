@@ -1,13 +1,14 @@
 package com.sdk.listagemapp.view
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.sdk.listagemapp.GitHubService
+import com.sdk.listagemapp.service.GitHubService
 import com.sdk.listagemapp.R
 import com.sdk.listagemapp.model.User
-import com.sdk.listagemapp.viewmodel.UserAdapter
+import com.sdk.listagemapp.adapter.UserAdapter
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -23,7 +24,7 @@ class ListActivity : AppCompatActivity() {
         setContentView(R.layout.activity_list)
 
         recyclerView = findViewById(R.id.recyclerView)
-        adapter = UserAdapter()
+        adapter = UserAdapter(::onItemClick)
 
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = adapter
@@ -36,7 +37,7 @@ class ListActivity : AppCompatActivity() {
         val service = retrofit.create(GitHubService::class.java)
         val call = service.getUsers()
 
-        call.enqueueCallback(object : Callback<List<User>> {
+        call.enqueueCallbackExtension(object : Callback<List<User>> {
             override fun onResponse(call: Call<List<User>>, response: Response<List<User>>) {
                 if (response.isSuccessful) {
                     val userList = response.body()
@@ -51,8 +52,17 @@ class ListActivity : AppCompatActivity() {
             }
         })
     }
-}
 
-fun <T> Call<T>.enqueueCallback(callback: Callback<T>) {
-    enqueue(callback)
+    private fun onItemClick(user: User) {
+        // Criar uma Intent para a nova atividade
+        val intent = Intent(this, DetalhesActivity::class.java)
+        // Passar os dados do usuário para a nova atividade
+        intent.putExtra("user", user)
+        // Iniciar a nova atividade
+        startActivity(intent)
+    }
+
+    private fun <T> Call<T>.enqueueCallbackExtension(callback: Callback<T>) {
+        enqueue(callback)
+    }
 }
