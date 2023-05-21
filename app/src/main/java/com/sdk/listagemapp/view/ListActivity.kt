@@ -3,6 +3,8 @@ package com.sdk.listagemapp.view
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -26,6 +28,8 @@ class ListActivity : AppCompatActivity() {
     private lateinit var service: GitHubService
     private lateinit var editTextSearch: EditText
     private var userList: List<User> = emptyList()
+    private val searchDelayMillis = 500L // Tempo de espera de 500 milissegundos
+    private val searchHandler = Handler(Looper.getMainLooper())
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,7 +79,8 @@ class ListActivity : AppCompatActivity() {
 
             override fun afterTextChanged(s: Editable?) {
                 val query = s.toString().trim()
-                searchUser(query)
+                searchHandler.removeCallbacksAndMessages(null) // Remove quaisquer chamadas de pesquisa pendentes
+                searchHandler.postDelayed({ searchUser(query) }, searchDelayMillis)
             }
         })
     }
