@@ -1,5 +1,6 @@
 package com.sdk.listagemapp.service
 
+import android.provider.ContactsContract
 import com.google.gson.JsonObject
 import com.sdk.listagemapp.model.User
 import retrofit2.Call
@@ -13,7 +14,6 @@ interface GitHubService {
     @GET("users/{username}")
     fun getUserDetails(@Path("username") username: String): Call<User>
 
-
-    @GET("users/{username}")
-    fun getAllFields(@Path("username") username: String): Call<JsonObject>
+    @GET("users/{username}/avatar_url")
+    fun getUserAvatarUrl(@Path("username") username: String): Call<String>
 }
