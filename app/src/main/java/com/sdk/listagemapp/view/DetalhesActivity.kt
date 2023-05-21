@@ -1,12 +1,16 @@
 package com.sdk.listagemapp.view
 
+import Repository
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.sdk.listagemapp.R
+import com.sdk.listagemapp.adapter.RepositoryAdapter
 import com.sdk.listagemapp.model.User
 import com.sdk.listagemapp.service.GitHubService
 import retrofit2.Call
@@ -19,6 +23,8 @@ class DetalhesActivity : AppCompatActivity() {
     private lateinit var textViewName: TextView
     private lateinit var textViewSelectedDetail: TextView
     private lateinit var imageViewProfile: ImageView
+    private lateinit var recyclerViewRepositories: RecyclerView
+    private lateinit var repositoryAdapter: RepositoryAdapter
 
     private lateinit var user: User
 
@@ -29,10 +35,15 @@ class DetalhesActivity : AppCompatActivity() {
         textViewName = findViewById(R.id.textViewName)
         textViewSelectedDetail = findViewById(R.id.textViewSelectedDetail)
         imageViewProfile = findViewById(R.id.imageViewProfile)
+        recyclerViewRepositories = findViewById(R.id.recyclerViewRepositories)
+        repositoryAdapter = RepositoryAdapter()
+
+        recyclerViewRepositories.layoutManager = LinearLayoutManager(this)
+        recyclerViewRepositories.adapter = repositoryAdapter
 
         user = intent?.getParcelableExtra<User>("user")!!
 
-        user?.let {
+        user.let {
             val retrofit = Retrofit.Builder()
                 .baseUrl("https://api.github.com/")
                 .addConverterFactory(GsonConverterFactory.create())
@@ -42,6 +53,7 @@ class DetalhesActivity : AppCompatActivity() {
 
             getUserDetails(service, it)
             getUserAvatarUrl(service, it)
+            getUserRepositories(service, it.reposUrl)
         }
     }
 
@@ -54,6 +66,7 @@ class DetalhesActivity : AppCompatActivity() {
                     val userDetails = response.body()
                     userDetails?.let {
                         updateUserDetails(userDetails)
+                        getUserRepositories(service, it.reposUrl) // Buscar os repositórios do usuário
                     }
                 } else {
                     // Tratar o caso de resposta não bem-sucedida
@@ -114,6 +127,32 @@ class DetalhesActivity : AppCompatActivity() {
             } else {
                 imageViewProfile.setImageResource(R.drawable.placeholder)
             }
+        }
+    }
+    private fun updateRepositories(repositories: List<Repository>) {
+        repositoryAdapter.setData(repositories)
+    }
+    private fun getUserRepositories(service: GitHubService, reposUrl: String?) {
+        reposUrl?.let {
+            val call = service.getUserRepositories(it)
+
+            call.enqueue(object : Callback<List<Repository>> {
+                override fun onResponse(call: Call<List<Repository>>, response: Response<List<Repository>>) {
+                    if (response.isSuccessful) {
+                        val repositories = response.body()
+                        repositories?.let {
+                            // Atualizar a lista de repositórios do usuário
+                            updateRepositories(repositories)
+                        }
+                    } else {
+                        // Tratar o caso de resposta não bem-sucedida
+                    }
+                }
+
+                override fun onFailure(call: Call<List<Repository>>, t: Throwable) {
+                    // Tratar o caso de falha na requisição
+                }
+            })
         }
     }
 }

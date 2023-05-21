@@ -9,9 +9,12 @@ data class User(
     @SerializedName("email") val email: String?,
     @SerializedName("login") val username: String?,
     @SerializedName("bio") val bio: String?,
+    @SerializedName("repos_url") val reposUrl: String?,
     @SerializedName("avatar_url") var profileImageUrl: String?
+
 ) : Parcelable {
     constructor(parcel: Parcel) : this(
+        parcel.readString(),
         parcel.readString(),
         parcel.readString(),
         parcel.readString(),
