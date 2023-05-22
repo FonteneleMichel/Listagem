@@ -74,7 +74,6 @@ class DetalhesActivity : AppCompatActivity() {
             }
 
             override fun onFailure(call: Call<User>, t: Throwable) {
-                // Tratar o caso de falha na requisição
             }
         })
     }
@@ -110,7 +109,6 @@ class DetalhesActivity : AppCompatActivity() {
             }
 
             override fun onFailure(call: Call<String?>, t: Throwable) {
-                // Tratar o caso de falha na requisição
             }
         })
     }
@@ -150,7 +148,6 @@ class DetalhesActivity : AppCompatActivity() {
                 }
 
                 override fun onFailure(call: Call<List<Repository>>, t: Throwable) {
-                    // Tratar o caso de falha na requisição
                 }
             })
         }
